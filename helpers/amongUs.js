@@ -17,12 +17,12 @@ amongUs.getPartyInfo = function(channel) {
 }
 
 // Get game activities from all users in (channel)
-amongUs.getGameActivitiesFromChannel =  function(id) {
+amongUs.getGameActivitiesFromChannel = function (id) {
   const channel = client.channels.cache.get(id);
 
   return channel.members.map((user) => {
     const actActivities = user.presence.activities
-    .filter((a) => a.name === config.GAME)
+    .filter((a) => a.name === config.GAME && a.state === config.STATE)
     .map((activity) => {
       return activity
     })
