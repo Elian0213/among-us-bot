@@ -3,7 +3,7 @@ function amongUs() {
 }
 
 // Get party info from (channel)
-amongUs.getPartyInfo = function(channel) {
+amongUs.getPartyInfo = function (channel) {
   const data = amongUs.getGameActivitiesFromChannel(channel);
 
   data.forEach((member) => {
@@ -17,12 +17,12 @@ amongUs.getPartyInfo = function(channel) {
 }
 
 // Get game activities from all users in (channel)
-amongUs.getGameActivitiesFromChannel =  function(id) {
+amongUs.getGameActivitiesFromChannel = function (id) {
   const channel = client.channels.cache.get(id);
 
   return channel.members.map((user) => {
     const actActivities = user.presence.activities
-    .filter((a) => a.name === config.GAME)
+    .filter((a) => a.name === config.GAME && a.state === config.STATE)
     .map((activity) => {
       return activity
     })
@@ -35,15 +35,35 @@ amongUs.getGameActivitiesFromChannel =  function(id) {
   })
 }
 
-amongUs.sendEmbed = function(game) {
+// sends or updates embed
+amongUs.sendEmbed = function (game) {
   const channel = client.channels.cache.get(config.GAME_INFO_CHANNEL);
+  channel.messages.fetch({limit: 1}).then(messages => {
+    const embed = amongUs.initEmbed(game);
+    const message = messages.first();
 
-  channel.send(new Discord.MessageEmbed()
+    if (message === undefined) {
+      channel.send(embed);
+    } else {
+      amongUs.editEmbed(message, embed);
+    }
+  }).catch(console.error);
+}
+
+// replaces embed of given message
+amongUs.editEmbed = function (message, embed) {
+  return message.edit(embed);
+}
+
+// creates the embed based on game
+amongUs.initEmbed = function (game) {
+  return new Discord.MessageEmbed()
   .setColor('#0099ff')
   .setTitle('Among Us')
   .addField('Code', game.id, true)
   .addField('Players', `${game.size[0]}/${game.size[1]}`)
-  .setTimestamp());
+  .setTimestamp()
+  .setFooter('Join Us!', client.user.displayAvatarURL());
 }
 
 module.exports = amongUs;
