@@ -1,5 +1,7 @@
 let detectedLobbies = [];
 
+const lobbyHelper = require('./lobby.js');
+
 function amongUs() {
   // h-hewo cutie >_<
 }
@@ -80,32 +82,6 @@ amongUs.initEmbed = function () {
   return embed;
 }
 
-amongUs.lobby = function (activity) {
-  this.players = [];
-
-  this.setValues = function (activity) {
-    this.code = activity.party.id;
-    this.amount = activity.party.size[0];
-    this.size = activity.party.size[1];
-  }
-
-  this.addPlayer = function (user) {
-    const exists = this.players.find(u => user.id === u.id);
-    if (exists === undefined) {
-      this.players.push(user);
-    }
-  }
-
-  this.joinPlayers = function () {
-    const names = this.players.map(p => {return p.name});
-    return names.join(', ');
-  }
-
-  this.setValues(activity);
-
-  return this;
-}
-
 amongUs.addLobby = function (lobby) {
   const exists = detectedLobbies.find(l => l.code === lobby.code);
   if (exists === undefined) {
@@ -118,7 +94,7 @@ amongUs.findOrCreateLobby = function (member) {
   let lobby = detectedLobbies.find(l => l.code === activity.party.id);
 
   if (lobby === undefined) {
-    lobby = amongUs.lobby(activity);
+    lobby = lobbyHelper.create(activity);
     return lobby;
   }
 
